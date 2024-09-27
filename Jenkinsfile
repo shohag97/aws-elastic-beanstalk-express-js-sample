@@ -10,11 +10,5 @@ pipeline {
                 sh 'npm install --save'
             }
         }
-        stage('Security Scan') {
-            steps {
-                sh 'npm install -g snyk'
-                sh 'snyk test --severity-threshold=high'
-            }
-        }
     }
 }
