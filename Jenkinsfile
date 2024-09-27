@@ -17,7 +17,7 @@ pipeline {
         }
         stage('Security Scan') {
             steps {
-                sh './node_modules/.bin/snyk test --severity-threshold=high'
+                sh './node_modules/.bin/snyk test'
             }
         }
     }
