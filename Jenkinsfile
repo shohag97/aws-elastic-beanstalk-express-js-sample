@@ -10,10 +10,14 @@ pipeline {
                 sh 'npm install --save'
             }
         }
+        stage('Install Snyk Locally') {
+            steps {
+                sh 'npm install snyk'
+            }
+        }
         stage('Security Scan') {
             steps {
-                sh 'npm install -g snyk'
-                sh 'snyk test --severity-threshold=high'
+                sh './node_modules/.bin/snyk test --severity-threshold=high'
             }
         }
     }
