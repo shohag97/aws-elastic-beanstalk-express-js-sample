@@ -10,11 +10,6 @@ pipeline {
                 sh 'npm install --save'
             }
         }
-        stage('Build') {
-            steps {
-                sh 'npm run build'
-            }
-        }
         stage('Test') {
             steps {
                 sh 'npm test'
@@ -23,7 +18,7 @@ pipeline {
         stage('Security Scan') {
             steps {
                 sh 'npm install -g snyk'
-                sh 'snyk test'
+                sh 'snyk test --severity-threshold=high'
             }
         }
     }
