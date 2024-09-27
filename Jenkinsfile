@@ -21,6 +21,16 @@ pipeline {
         sh 'npm test'
       }
     }
+    stage('Security Scan') {
+      steps {
+        withCredentials([string(credentialsId: 'snyk-token', variable: 'SNYK_TOKEN')]) {
+          // Install Snyk locally
+          sh 'npm install snyk'
+          // Run Snyk scan, allow pipeline to continue even if vulnerabilities are found
+          sh './node_modules/.bin/snyk test || true'
+        }
+      }
+    }
   }
   post {
     always {
