@@ -5,43 +5,70 @@ pipeline {
     stages {
         stage('Install Dependencies') {
             steps {
-                echo 'Installing dependencies...'
-                sh 'npm install --save'
+                script {
+                    try {
+                        echo 'Installing dependencies...'
+                        sh 'npm install --save'
+                        echo 'Dependencies installed successfully.'
+                    } catch (Exception e) {
+                        echo 'Failed to install dependencies.'
+                        error('Stopping pipeline due to failure in Install Dependencies stage.')
+                    }
+                }
             }
         }
         stage('Build') {
             steps {
-                echo 'Building the application...'
-                sh 'npm run build'
+                script {
+                    try {
+                        echo 'Building the application...'
+                        sh 'npm run build'
+                        echo 'Build completed successfully.'
+                    } catch (Exception e) {
+                        echo 'Build failed.'
+                        error('Stopping pipeline due to failure in Build stage.')
+                    }
+                }
             }
         }
         stage('Test') {
             steps {
-                echo 'Running tests...'
-                sh 'npm test'
+                script {
+                    try {
+                        echo 'Running tests...'
+                        sh 'npm test'
+                        echo 'Tests ran successfully.'
+                    } catch (Exception e) {
+                        echo 'Tests failed.'
+                        error('Stopping pipeline due to failure in Test stage.')
+                    }
+                }
             }
         }
         stage('Security Scan') {
             steps {
-                withCredentials([string(credentialsId: 'snyk-token', variable: 'SNYK_TOKEN')]) {
-                    // Install Snyk locally
-                    sh 'npm install snyk'
-                    // Run Snyk, but ignore exit code to avoid failing the pipeline
-                    sh './node_modules/.bin/snyk test || true'
+                script {
+                    try {
+                        echo 'Running Snyk Security Scan...'
+                        withCredentials([string(credentialsId: 'snyk-token', variable: 'SNYK_TOKEN')]) {
+                            sh 'npm install snyk'
+                            sh './node_modules/.bin/snyk test || true'
+                        }
+                        echo 'Snyk security scan completed.'
+                    } catch (Exception e) {
+                        echo 'Snyk security scan failed.'
+                        error('Stopping pipeline due to failure in Security Scan stage.')
+                    }
                 }
             }
         }
     }
     post {
-        always {
-            echo 'Archiving logs...'
-            archiveArtifacts artifacts: '**/logs/**/*.log', allowEmptyArchive: true
-        }
         success {
             echo 'Pipeline completed successfully.'
         }
         failure {
-            echo 'Pipeline failed. Check logs for more details.'
+            echo 'Pipeline failed.'
         }
     }
 }
