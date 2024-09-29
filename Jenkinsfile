@@ -62,5 +62,18 @@ pipeline {
                 }
             }
         }
+        stage('Deploy') {
+            steps {
+                script {
+                    try {
+                        echo 'Deploying the application...'
+                        echo 'Application deployed successfully.'
+                    } catch (Exception e) {
+                        echo 'Deployment failed.'
+                        error('Stopping pipeline due to failure in Deploy stage.')
+                    }
+                }
+            }
+        }
     }
 }
